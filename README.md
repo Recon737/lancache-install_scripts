@@ -4,4 +4,4 @@ A set of scripts that derived by translating the Dockerfiles of the monolithic i
 
 I wrote these to help in setting up LanCache in a LXC container on proxmox. Currently, placing all scripts into /root of an Ubuntu 24.04 LXC and running install.sh produces a functional lancache server. This does not provide the lancache-dns functionality, and requires dns to be resolved separately. 
 
-All environment variables are hardcoded and embedded into the nginx files during install. In the future, I would like to re-write the install process to use envsubst s outlined [here](https://www.baeldung.com/linux/nginx-config-environment-variables).
+All environment variables are hardcoded and embedded into the nginx files during install. In the future, I would like to re-write the install process to use envsubst as outlined [here](https://www.baeldung.com/linux/nginx-config-environment-variables).
