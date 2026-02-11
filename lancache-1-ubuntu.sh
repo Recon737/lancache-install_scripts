@@ -23,8 +23,9 @@ locale-gen en_US.UTF-8 && update-locale LANG=en_US.UTF-8
 apt-get -y clean && rm -rf /var/lib/apt/lists/*
 
 
-# add env variables to .bashrc and  activate them
-cat <<EOF >> ~/.bashrc
+# create env file, add it to .bashrc and activate them
+cat <<EOF >> /root/lancache-ubuntu.env
+# LanCache Script 1 - lancachenet/ubuntu environment variables
 export DEBIAN_FRONTEND=noninteractive
 export SUPERVISORD_EXIT_ON_FATAL=1
 export LC_ALL=en_US.UTF-8
@@ -33,6 +34,7 @@ export LANGUAGE=en_US.UTF-8
 export TZ=America/New_York
 export SUPERVISORD_LOGLEVEL=WARN
 EOF
+echo "source /root/lancache-ubuntu.env" >> ~/.bashrc
 source ~/.bashrc
 
 # clone the github repo and copy overlay directory
@@ -43,4 +45,4 @@ cp -r ~/lancachenet-ubuntu/overlay/* /
 chmod -R 755 /init /hooks
 
 # Dockerfile ENTRYPOINT + CMD
-/bin/bash -e /init/entrypoint /init/supervisord
+#/bin/bash -e /init/entrypoint /init/supervisord
