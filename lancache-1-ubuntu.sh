@@ -11,8 +11,9 @@ set -e
 export DEBIAN_FRONTEND=noninteractive
 
 # update, upgrade, and install dependencies
-apt-get -y update && apt-get -y upgrade
-apt-get -y install supervisor curl wget bzip2 locales-all tzdata git --no-install-recommends
+apt-get update -y && \
+apt-get upgrade -y && \
+apt-get install supervisor curl wget bzip2 locales-all tzdata git --no-install-recommends -y
 
 # set local
 #locale-gen en_GB.utf8 && update-locale LANG=en_GB.utf8
