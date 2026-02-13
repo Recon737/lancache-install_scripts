@@ -13,7 +13,7 @@ export DEBIAN_FRONTEND=noninteractive
 # update, upgrade, and install dependencies
 apt-get update -y && \
 apt-get upgrade -y && \
-apt-get install supervisor curl wget bzip2 locales-all tzdata git --no-install-recommends -y
+apt-get install curl wget bzip2 locales-all tzdata git --no-install-recommends -y
 
 # set local
 #locale-gen en_GB.utf8 && update-locale LANG=en_GB.utf8
@@ -21,7 +21,6 @@ locale-gen en_US.UTF-8 && update-locale LANG=en_US.UTF-8
 
 # clean apt cache
 apt-get -y clean && rm -rf /var/lib/apt/lists/*
-
 
 # create env file, add it to .bashrc and activate them
 cat <<EOF >> /root/lancache-ubuntu.env

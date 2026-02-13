@@ -1,0 +1,12 @@
+[Unit]
+Description=LanCache-Monolithic - Heartbeat
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /scripts/heartbeat.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
