@@ -72,11 +72,13 @@ ln -sf /etc/nginx/sites-available/30_metrics.conf /etc/nginx/sites-enabled/30_me
 ln -sf /etc/nginx/stream-available/10_sni.conf /etc/nginx/stream-enabled/10_sni.conf
 
 # clone the cache-domains repo if it doesnt already exist
-if [ -d /data/cachedomains ]; then 
-    git -C /data/cachedomains fetch --depth=1
+# modified and adapated from '/overlay/hooks/entrypoint-pre.d/15_generate_maps.sh'
+export GIT_SSH_COMMAND="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+if [ -d /data/cachedomains.git ]; then 
+    git fetch origin
+    git reset --hard origin/${CACHE_DOMAINS_BRANCH}
 else
     git clone --depth=1 --no-single-branch https://github.com/uklans/cache-domains/ /data/cachedomains
-    git config --global --add safe.directory /data/cachedomains
 fi
 
 # Create volume mount points
