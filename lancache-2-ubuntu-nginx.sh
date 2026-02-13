@@ -9,8 +9,12 @@
 # exit script if any step fails
 set -e
 
-# clone the github repo and copy overlay directory
-git clone https://github.com/lancachenet/ubuntu-nginx.git ~/lancachenet-ubuntu-nginx
+# clone/fetch the github repo and copy overlay directory
+if [ -d /the/dir ]; then 
+    git clone https://github.com/lancachenet/ubuntu-nginx.git ~/lancachenet-ubuntu-nginx
+else
+    git -C ~/lancachenet-ubuntu-nginx fetch
+fi
 cp -r ~/lancachenet-ubuntu-nginx/overlay/* /
 
 # update, upgrade, and install dependencies

@@ -10,35 +10,36 @@
 set -e
 
 # update, upgrade, and install dependencies
-apt-get update -y && \
-# apt-get upgrade -y && \ # this upgrade is superfluous
-apt-get install jq --no-install-recommends -y
+apt-get update -y && apt-get install jq --no-install-recommends -y
 
 # create env file, add it to .bashrc and activate them
-cat <<EOF >> /root/lancache-monolithic.env
+cat <<EOF >> ~/lancache-monolithic.env
 # LanCache Script 3 - lancachenet/monolithic environment variables
-export GENERICCACHE_VERSION=2 \
-export CACHE_MODE=monolithic \
-export WEBUSER=www-data \
-export CACHE_INDEX_SIZE=500m \
-export CACHE_DISK_SIZE=50g \
-export MIN_FREE_DISK=10g \
-export CACHE_MAX_AGE=3560d \
-export CACHE_SLICE_SIZE=1m \
-export UPSTREAM_DNS="8.8.8.8 8.8.4.4" \
-export BEAT_TIME=1h \
-export LOGFILE_RETENTION=3560 \
-export CACHE_DOMAINS_REPO="https://github.com/uklans/cache-domains.git" \
-export CACHE_DOMAINS_BRANCH=master \
-export NGINX_WORKER_PROCESSES=auto \
+export GENERICCACHE_VERSION=2
+export CACHE_MODE=monolithic
+export WEBUSER=www-data
+export CACHE_INDEX_SIZE=500m
+export CACHE_DISK_SIZE=50g
+export MIN_FREE_DISK=10g
+export CACHE_MAX_AGE=3560d
+export CACHE_SLICE_SIZE=1m
+export UPSTREAM_DNS="8.8.8.8 8.8.4.4"
+export BEAT_TIME=1h
+export LOGFILE_RETENTION=3560
+export CACHE_DOMAINS_REPO="https://github.com/uklans/cache-domains.git"
+export CACHE_DOMAINS_BRANCH=master
+export NGINX_WORKER_PROCESSES=auto
 export NGINX_LOG_FORMAT=cachelog
-export LOG_FORMAT=cachelog
 EOF
 echo "source /root/lancache-monolithic.env" >> ~/.bashrc
 source ~/.bashrc
 
-# clone the github repo and copy overlay directory
-git clone https://github.com/lancachenet/monolithic.git ~/lancachenet-monolithic
+# clone/fetch the github repo and copy overlay directory
+if [ -d /the/dir ]; then 
+    git clone https://github.com/lancachenet/monolithic.git ~/lancachenet-monolithic
+else
+    git -C ~/lancachenet-monolithic fetch
+fi
 cp -r ~/lancachenet-monolithic/overlay/* /
 
 # delete nginx defaults
@@ -71,13 +72,15 @@ ln -s /etc/nginx/sites-available/20_upstream.conf /etc/nginx/sites-enabled/20_up
 ln -s /etc/nginx/sites-available/30_metrics.conf /etc/nginx/sites-enabled/30_metrics.conf; \
 ln -s /etc/nginx/stream-available/10_sni.conf /etc/nginx/stream-enabled/10_sni.conf; \
 
-# clone the cache-domains repo
-git clone --depth=1 --no-single-branch https://github.com/uklans/cache-domains/ /data/cachedomains
+# clone the cache-domains repo if it doesnt already exist
+if [ -d /the/dir ]; then 
+    git clone --depth=1 --no-single-branch https://github.com/uklans/cache-domains/ /data/cachedomains
+else
+    git -C /data/cachedomains fetch --depth=1
+fi
 
 # Create volume mount points
 mkdir -p /data/logs /data/cache /data/cachedomains /var/www
 
 # Create /scripts symlink in home directory (WORKDIR replacement)
 ln -s /scripts ~/scripts
-
-echo

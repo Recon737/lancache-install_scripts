@@ -37,8 +37,12 @@ EOF
 echo "source /root/lancache-ubuntu.env" >> ~/.bashrc
 source ~/.bashrc
 
-# clone the github repo and copy overlay directory
-git clone https://github.com/lancachenet/ubuntu.git ~/lancachenet-ubuntu
+# clone/fetch the github repo and copy overlay directory
+if [ -d /the/dir ]; then 
+    git clone https://github.com/lancachenet/ubuntu.git ~/lancachenet-ubuntu
+else
+    git -C ~/lancachenet-ubuntu fetch
+fi
 cp -r ~/lancachenet-ubuntu/overlay/* /
 
 # Set perms
