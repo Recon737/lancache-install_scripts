@@ -30,21 +30,22 @@ export CACHE_DOMAINS_REPO="https://github.com/uklans/cache-domains.git"
 export CACHE_DOMAINS_BRANCH=master
 export NGINX_WORKER_PROCESSES=auto
 export NGINX_LOG_FORMAT=cachelog
+export LOG_FORMAT=cachelog
 EOF
 echo "source /root/lancache-monolithic.env" >> ~/.bashrc
 source ~/.bashrc
 
 # clone/fetch the github repo and copy overlay directory
-if [ -d /the/dir ]; then 
-    git clone https://github.com/lancachenet/monolithic.git ~/lancachenet-monolithic
-else
+if [ -d ~/lancachenet-monolithic ]; then 
     git -C ~/lancachenet-monolithic fetch
+else
+    git clone https://github.com/lancachenet/monolithic.git ~/lancachenet-monolithic
 fi
 cp -r ~/lancachenet-monolithic/overlay/* /
 
 # delete nginx defaults
-rm /etc/nginx/sites-enabled/* /etc/nginx/stream-enabled/*
-rm /etc/nginx/conf.d/gzip.conf
+rm -f /etc/nginx/sites-enabled/* /etc/nginx/stream-enabled/*
+rm -f /etc/nginx/conf.d/gzip.conf
 
 #create dummy tallylog and set perms
 touch /var/log/tallylog && \
@@ -58,29 +59,28 @@ mkdir -m 755 -p /data/cache
 mkdir -m 755 -p /data/info
 mkdir -m 755 -p /data/logs
 mkdir -m 755 -p /tmp/nginx/
-mkdir -m 755 -p /data/cachedomains
-mkdir -m 755 -p /tmp/nginx
 
 # set perms/ownership  
 chmod 755 /scripts/*
 chown -R ${WEBUSER}:${WEBUSER} /data
 
 # create sites-enabled and symlink available sites to enabled directory    
-mkdir -p /etc/nginx/sites-enabled	;\
-ln -s /etc/nginx/sites-available/10_cache.conf /etc/nginx/sites-enabled/10_generic.conf; \
-ln -s /etc/nginx/sites-available/20_upstream.conf /etc/nginx/sites-enabled/20_upstream.conf; \
-ln -s /etc/nginx/sites-available/30_metrics.conf /etc/nginx/sites-enabled/30_metrics.conf; \
-ln -s /etc/nginx/stream-available/10_sni.conf /etc/nginx/stream-enabled/10_sni.conf; \
+mkdir -p /etc/nginx/sites-enabled
+ln -sf /etc/nginx/sites-available/10_cache.conf /etc/nginx/sites-enabled/10_generic.conf
+ln -sf /etc/nginx/sites-available/20_upstream.conf /etc/nginx/sites-enabled/20_upstream.conf
+ln -sf /etc/nginx/sites-available/30_metrics.conf /etc/nginx/sites-enabled/30_metrics.conf
+ln -sf /etc/nginx/stream-available/10_sni.conf /etc/nginx/stream-enabled/10_sni.conf
 
 # clone the cache-domains repo if it doesnt already exist
-if [ -d /the/dir ]; then 
-    git clone --depth=1 --no-single-branch https://github.com/uklans/cache-domains/ /data/cachedomains
-else
+if [ -d /data/cachedomains ]; then 
     git -C /data/cachedomains fetch --depth=1
+else
+    git clone --depth=1 --no-single-branch https://github.com/uklans/cache-domains/ /data/cachedomains
+    git config --global --add safe.directory /data/cachedomains
 fi
 
 # Create volume mount points
 mkdir -p /data/logs /data/cache /data/cachedomains /var/www
 
 # Create /scripts symlink in home directory (WORKDIR replacement)
-ln -s /scripts ~/scripts
+ln -fs /scripts ~/scripts

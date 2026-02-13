@@ -10,10 +10,11 @@
 set -e
 
 # clone/fetch the github repo and copy overlay directory
-if [ -d /the/dir ]; then 
-    git clone https://github.com/lancachenet/ubuntu-nginx.git ~/lancachenet-ubuntu-nginx
-else
+if [ -d ~/lancachenet-ubuntu-nginx ]; then 
     git -C ~/lancachenet-ubuntu-nginx fetch
+else
+    git clone https://github.com/lancachenet/ubuntu-nginx.git ~/lancachenet-ubuntu-nginx
+    
 fi
 cp -r ~/lancachenet-ubuntu-nginx/overlay/* /
 
@@ -36,20 +37,20 @@ apt-get -y clean && rm -rf /var/lib/apt/lists/*
 chmod 777 /opt/nginx/startnginx.sh && \
 
 # remove nginx defaults
-rm /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default && \
+rm -f /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default && \
 
 # create sites-enabled and symlink available sites to enabled directory
 mkdir -p /etc/nginx/sites-enabled/ && \
 for SITE in /etc/nginx/sites-available/*; do 
     [ -e "$SITE" ] || continue; 
-    ln -s $SITE /etc/nginx/sites-enabled/`basename $SITE`; 
+    ln -sf $SITE /etc/nginx/sites-enabled/`basename $SITE`; 
 done
 
 # create stream-enabled and symlink available streams to enabled directory
 mkdir -p /etc/nginx/stream-enabled/ && \
 for SITE in /etc/nginx/stream-available/*; do 
     [ -e "$SITE" ] || continue;
-    ln -s $SITE /etc/nginx/stream-enabled/`basename $SITE`;
+    ln -sf $SITE /etc/nginx/stream-enabled/`basename $SITE`;
 done
 
 # Set misc permissions

@@ -38,10 +38,10 @@ echo "source /root/lancache-ubuntu.env" >> ~/.bashrc
 source ~/.bashrc
 
 # clone/fetch the github repo and copy overlay directory
-if [ -d /the/dir ]; then 
-    git clone https://github.com/lancachenet/ubuntu.git ~/lancachenet-ubuntu
-else
+if [ -d ~/lancachenet-ubuntu ]; then 
     git -C ~/lancachenet-ubuntu fetch
+else
+    git clone https://github.com/lancachenet/ubuntu.git ~/lancachenet-ubuntu
 fi
 cp -r ~/lancachenet-ubuntu/overlay/* /
 
