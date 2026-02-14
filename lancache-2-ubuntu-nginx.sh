@@ -9,14 +9,7 @@
 # exit script if any step fails
 set -e
 
-# clone/fetch the github repo and copy overlay directory
-if [ -d ~/lancachenet-ubuntu-nginx ]; then 
-    git -C ~/lancachenet-ubuntu-nginx fetch
-else
-    git clone https://github.com/lancachenet/ubuntu-nginx.git ~/lancachenet-ubuntu-nginx
-    
-fi
-cp -r ~/lancachenet-ubuntu-nginx/overlay/* /
+LANCACHE_DIR=/opt/lancache
 
 # update, upgrade, and install dependencies
 apt-get update -y && \
@@ -34,10 +27,21 @@ apt-get install nginx-full --no-install-recommends -y
 apt-get -y clean && rm -rf /var/lib/apt/lists/*
 
 # set perms for nginx start script
+# TO BE REMOVED - THIS IS LEFT OVER FROM SUPERVISORD
 chmod 777 /opt/nginx/startnginx.sh && \
 
+# clone/fetch the github repo and copy overlay directory
+mkdir -p $LANCACHE_DIR
+if [ -d ~/lancachenet-ubuntu-nginx ]; then 
+    git -C $LANCACHE_DIR/lancachenet-ubuntu-nginx fetch
+else
+    git clone https://github.com/lancachenet/ubuntu-nginx.git $LANCACHE_DIR/lancachenet-ubuntu-nginx
+    
+fi
+cp -r $LANCACHE_DIR/lancachenet-ubuntu-nginx/overlay/* /
+
 # remove nginx defaults
-rm -f /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default && \
+rm -f /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 # create sites-enabled and symlink available sites to enabled directory
 mkdir -p /etc/nginx/sites-enabled/ && \
@@ -56,7 +60,7 @@ done
 # Set misc permissions
 mkdir -p /var/www/html && chmod 777 /var/www/html 
 chmod 777 /var/lib/nginx
-chmod -R 777 /var/log/nginx && \
-chmod -R 755 /hooks /init && \
-chmod 755 /var/www && \
+chmod -R 777 /var/log/nginx
+chmod -R 755 /hooks /init
+chmod 755 /var/www
 chmod -R 666 /etc/nginx/sites-* /etc/nginx/conf.d/* /etc/nginx/stream.d/* /etc/nginx/stream-*

@@ -9,11 +9,14 @@
 # exit script if any step fails
 set -e
 
+LANCACHE_DIR=/opt/lancache
+
 # update, upgrade, and install dependencies
 apt-get update -y && apt-get install jq --no-install-recommends -y
 
 # create env file, add it to .bashrc and activate them
-cat <<EOF >> ~/lancache-monolithic.env
+mkdir -p $LANCACHE_DIR
+cat <<EOF >> $LANCACHE_DIR/lancache-monolithic.env
 # LanCache Script 3 - lancachenet/monolithic environment variables
 export GENERICCACHE_VERSION=2
 export CACHE_MODE=monolithic
@@ -32,16 +35,16 @@ export NGINX_WORKER_PROCESSES=auto
 export NGINX_LOG_FORMAT=cachelog
 export LOG_FORMAT=cachelog
 EOF
-echo "source /root/lancache-monolithic.env" >> ~/.bashrc
+echo "source $LANCACHE_DIR/lancache-monolithic.env" >> ~/.bashrc
 source ~/.bashrc
 
 # clone/fetch the github repo and copy overlay directory
-if [ -d ~/lancachenet-monolithic ]; then 
-    git -C ~/lancachenet-monolithic fetch
+if [ -d $LANCACHE_DIR/lancachenet-monolithic ]; then 
+    git -C $LANCACHE_DIR/lancachenet-monolithic fetch
 else
-    git clone https://github.com/lancachenet/monolithic.git ~/lancachenet-monolithic
+    git clone https://github.com/lancachenet/monolithic.git $LANCACHE_DIR/lancachenet-monolithic
 fi
-cp -r ~/lancachenet-monolithic/overlay/* /
+cp -r $LANCACHE_DIR/lancachenet-monolithic/overlay/* /
 
 # delete nginx defaults
 rm -f /etc/nginx/sites-enabled/* /etc/nginx/stream-enabled/*

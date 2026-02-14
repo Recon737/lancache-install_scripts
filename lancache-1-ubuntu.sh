@@ -7,6 +7,8 @@
 # exit script if any step fails
 set -e
 
+LANCACHE_DIR=/opt/lancache
+
 # add this to .bashrc later
 export DEBIAN_FRONTEND=noninteractive
 
@@ -23,7 +25,8 @@ locale-gen en_US.UTF-8 && update-locale LANG=en_US.UTF-8
 apt-get -y clean && rm -rf /var/lib/apt/lists/*
 
 # create env file, add it to .bashrc and activate them
-cat <<EOF >> /root/lancache-ubuntu.env
+mkdir -p $LANCACHE_DIR
+cat <<EOF >> $LANCACHE_DIR/lancache-ubuntu.env
 # LanCache Script 1 - lancachenet/ubuntu environment variables
 export DEBIAN_FRONTEND=noninteractive
 export SUPERVISORD_EXIT_ON_FATAL=1
@@ -33,19 +36,17 @@ export LANGUAGE=en_US.UTF-8
 export TZ=America/New_York
 export SUPERVISORD_LOGLEVEL=WARN
 EOF
-echo "source /root/lancache-ubuntu.env" >> ~/.bashrc
+echo "source $LANCACHE_DIR/lancache-ubuntu.env" >> ~/.bashrc
 source ~/.bashrc
 
 # clone/fetch the github repo and copy overlay directory
-if [ -d ~/lancachenet-ubuntu ]; then 
-    git -C ~/lancachenet-ubuntu fetch
+if [ -d $LANCACHE_DIR/lancachenet-ubuntu ]; then 
+    git -C $LANCACHE_DIR/lancachenet-ubuntu fetch
 else
-    git clone https://github.com/lancachenet/ubuntu.git ~/lancachenet-ubuntu
+    git clone https://github.com/lancachenet/ubuntu.git $LANCACHE_DIR/lancachenet-ubuntu
 fi
-cp -r ~/lancachenet-ubuntu/overlay/* /
+cp -r $LANCACHE_DIR/lancachenet-ubuntu/overlay/* /
 
 # Set perms
 chmod -R 755 /init /hooks
 
-# Dockerfile ENTRYPOINT + CMD
-#/bin/bash -e /init/entrypoint /init/supervisord
